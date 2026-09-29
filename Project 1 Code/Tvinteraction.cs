@@ -1,14 +1,12 @@
 using UnityEngine;
 using UnityEngine.Video;
 
-/// <summary>
-/// Put on the TV. The screen shows its plain material until the TV is clicked;
-/// clicking plays the video (turns the TV on) and completes the "tv" task while a game is running.
+/// The screen shows its plain material until the TV is clicked
+
+/// Clicking plays the video (turns the TV on) and completes the "tv" task while a game is running.
+
 /// Set taskId = "tv" in the Inspector. Hook the XR interactable's Select Entered to TurnOnTV().
-///
-/// Video setup: a Video Player on the screen with Play On Awake OFF, Render Mode = Render Texture,
-/// Target Texture = TVScreen_RT, and screenOnMaterial showing that render texture.
-/// </summary>
+
 public class TVInteraction : TaskObject
 {
     [Header("TV visuals (all optional)")]
@@ -33,27 +31,26 @@ public class TVInteraction : TaskObject
             tvVideo.playOnAwake = false;
             tvVideo.isLooping = true;
             tvVideo.errorReceived += (vp, message) => Debug.LogError("[TV] Video error: " + message, this);
-            // Decode the first frames now so the screen lights up the instant it is clicked.
             tvVideo.Prepare();
         }
     }
 
-    // Hook this to the XR interactable's Select Entered. Turns the TV on any time.
+    // Turns the TV on any time it is clicked.
+    
     public void TurnOnTV()
     {
         Debug.Log("[TV] Clicked - TurnOnTV()", this);
 
-        // Complete the task FIRST so a video/codec hiccup can never block it.
-        Interact();   // base: completes the "tv" task if the game is running (ignored otherwise)
+        Interact(); 
 
-        // Then turn the screen on, guarded so any video error can't break the click.
+        // Code is guarded so any video error can't break the click.
+        
         try { SetOn(true); }
         catch (System.Exception e) { Debug.LogError("[TV] Failed to start video: " + e.Message, this); }
     }
 
     protected override void OnInteract()
     {
-        // Visuals are already handled by TurnOnTV(); keep this idempotent.
         SetOn(true);
     }
 
@@ -81,13 +78,12 @@ public class TVInteraction : TaskObject
             {
                 tvVideo.Stop();
                 ClearScreen();
-                tvVideo.Prepare();   // ready for the next click
+                tvVideo.Prepare();
             }
             if (tvAudio) tvAudio.Stop();
         }
     }
 
-    // Blank the render texture so the "off" TV never shows a leftover video frame.
     private void ClearScreen()
     {
         if (!tvVideo || !tvVideo.targetTexture) return;
