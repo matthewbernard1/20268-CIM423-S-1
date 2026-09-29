@@ -4,14 +4,12 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using TMPro;
 
-/// <summary>
-/// Late Night Studying - central game/task manager.
+/// Game Manager for Late Night Studying
+
 /// Tasks can be completed in ANY order. When all 5 are done the end screen shows,
-/// the room goes dark, the player is returned to the bed, and everything resets
-/// (the "it was a dream" / Groundhog Day loop).
-///
-/// Put this on an empty GameObject called "GameManager" in the scene.
-/// </summary>
+
+/// the room goes dark, the player is returned to the bed, and everything resets (Groundhog Day reference)
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -62,24 +60,20 @@ public class GameManager : MonoBehaviour
     public string tvLabel = "Turn on the TV";
     public string closetLabel = "Open the closet";
 
-    // ---- runtime state ----
     public const int TotalTasks = 5;
     public bool GameStarted { get; private set; }
     private readonly HashSet<string> completedTasks = new HashSet<string>();
     private readonly List<TaskObject> registeredObjects = new List<TaskObject>();
     private Coroutine signRoutine;
 
-    // Exact spot captured when the game starts, restored at the end.
     private Vector3 startPos;
     private Quaternion startRot;
     private bool hasStartSpot;
 
-    // Runtime head-locked black-fade overlay.
     private GameObject fadeRoot;
     private UnityEngine.UI.Image fadeImg;
     private TextMeshProUGUI fadeText;
 
-    // ------------------------------------------------------------------
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -99,17 +93,13 @@ public class GameManager : MonoBehaviour
         if (!registeredObjects.Contains(obj)) registeredObjects.Add(obj);
     }
 
-    // ------------------------------------------------------------------
-    // Hook this to the Start button's OnClick() on HUD_Canvas.
-    // ------------------------------------------------------------------
+
     public void StartGame()
     {
         if (GameStarted) return;
         GameStarted = true;
         completedTasks.Clear();
-
-        // Every run starts fresh: anything the player fiddled with before pressing Start
-        // (e.g. the TV) goes back to its starting state so it can be done as a task.
+        
         foreach (var obj in registeredObjects) if (obj) obj.ResetObject();
 
         if (startPanel) startPanel.SetActive(false);
@@ -129,10 +119,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("[GameManager] Game started.");
     }
 
-    // ------------------------------------------------------------------
-    // Called by each TaskObject when the player interacts with it.
-    // taskId: "lamp", "drawer", "book", "tv", "closet"
-    // ------------------------------------------------------------------
     public bool CompleteTask(string taskId, string signMessage)
     {
         if (!GameStarted)
@@ -158,7 +144,6 @@ public class GameManager : MonoBehaviour
 
     public bool IsTaskDone(string taskId) => completedTasks.Contains(taskId.ToLower());
 
-    // ------------------------------------------------------------------
     public void SetAmbient(Color c)
     {
         RenderSettings.ambientMode = AmbientMode.Flat;
@@ -197,9 +182,8 @@ public class GameManager : MonoBehaviour
         signText.text = "";
     }
 
-    // ------------------------------------------------------------------
-    // ENDING: Good Job -> darkness -> wake up in bed -> everything reset
-    // ------------------------------------------------------------------
+    // ENDING: Good Job text followed by darkness then wake up in bed with everything reset
+    
     private IEnumerator EndSequence()
     {
         yield return new WaitForSeconds(1f);
@@ -210,16 +194,15 @@ public class GameManager : MonoBehaviour
         EnsureFadeOverlay();
         if (fadeText) fadeText.text = completeMessage;
 
-        // The black screen slowly looms in while the completion text is presented.
+        // The black screen is displayed
         yield return Fade(0f, 1f, fadeSeconds);
 
-        // Fully black: bring the player back to exactly where they started.
         if (xrOrigin && hasStartSpot)
             xrOrigin.SetPositionAndRotation(startPos, startRot);
         else if (xrOrigin && bedSpawnPoint)
             xrOrigin.SetPositionAndRotation(bedSpawnPoint.position, Quaternion.Euler(0f, bedSpawnPoint.eulerAngles.y, 0f));
 
-        // Put the room back to its opening state behind the black.
+        // Put the room back to its opening state behind the black
         ResetRoom(showStartScreen: true);
 
         if (fadeText) fadeText.text = wakeUpMessage;
@@ -253,7 +236,6 @@ public class GameManager : MonoBehaviour
         var c = fadeImg.color; c.a = a; fadeImg.color = c;
     }
 
-    // Builds a head-locked black overlay (with a message) in front of the camera.
     private void EnsureFadeOverlay()
     {
         if (fadeRoot != null) return;
@@ -270,7 +252,6 @@ public class GameManager : MonoBehaviour
         rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
         rt.sizeDelta = new Vector2(2400, 1600);
         fadeRoot.transform.SetParent(cam.transform, false);
-        // Far enough and sized to blanket the whole (VR-wide) field of view.
         fadeRoot.transform.localPosition = new Vector3(0f, 0f, 0.8f);
         fadeRoot.transform.localRotation = Quaternion.identity;
         fadeRoot.transform.localScale = Vector3.one * 0.0011f;
@@ -286,7 +267,6 @@ public class GameManager : MonoBehaviour
         var txtGO = new GameObject("Message");
         txtGO.transform.SetParent(fadeRoot.transform, false);
         var trt = txtGO.AddComponent<RectTransform>();
-        // A centered text column, well inside the big black canvas.
         trt.anchorMin = trt.anchorMax = new Vector2(0.5f, 0.5f);
         trt.pivot = new Vector2(0.5f, 0.5f);
         trt.sizeDelta = new Vector2(1100, 800);
@@ -317,9 +297,6 @@ public class GameManager : MonoBehaviour
         if (signText) signText.text = "";
     }
 
-    // ------------------------------------------------------------------
-    // Editor testing without a headset: Space = start, 1-5 = tasks
-    // ------------------------------------------------------------------
     void Update()
     {
 #if UNITY_EDITOR
