@@ -68,3 +68,4 @@ public class ClosetInteraction : TaskObject
         if (hungClothes) hungClothes.SetActive(false);
     }
 }
+
