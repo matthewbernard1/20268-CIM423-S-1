@@ -82,12 +82,14 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        // Make sure the ambient mode is "Color" so RenderSettings.ambientLight is what the room uses.
+        // Makes sure the ambient mode is "Color".
+        
         RenderSettings.ambientMode = AmbientMode.Flat;
         ResetRoom(showStartScreen: true);
     }
 
     // Objects (lamp, drawer, tv...) register themselves so we can reset them later.
+    
     public void Register(TaskObject obj)
     {
         if (!registeredObjects.Contains(obj)) registeredObjects.Add(obj);
@@ -108,6 +110,7 @@ public class GameManager : MonoBehaviour
         if (taskPanel) taskPanel.SetActive(true);
 
         // Remember exactly where the player started, to return them here at the end.
+        
         if (xrOrigin)
         {
             startPos = xrOrigin.position;
@@ -128,7 +131,7 @@ public class GameManager : MonoBehaviour
         }
 
         taskId = taskId.ToLower();
-        if (completedTasks.Contains(taskId)) return false; // already done
+        if (completedTasks.Contains(taskId)) return false;
 
         completedTasks.Add(taskId);
         Debug.Log($"[GameManager] Task complete: {taskId} ({completedTasks.Count}/{TotalTasks})");
@@ -195,6 +198,7 @@ public class GameManager : MonoBehaviour
         if (fadeText) fadeText.text = completeMessage;
 
         // The black screen is displayed
+        
         yield return Fade(0f, 1f, fadeSeconds);
 
         if (xrOrigin && hasStartSpot)
@@ -203,12 +207,14 @@ public class GameManager : MonoBehaviour
             xrOrigin.SetPositionAndRotation(bedSpawnPoint.position, Quaternion.Euler(0f, bedSpawnPoint.eulerAngles.y, 0f));
 
         // Put the room back to its opening state behind the black
+        
         ResetRoom(showStartScreen: true);
 
         if (fadeText) fadeText.text = wakeUpMessage;
         yield return new WaitForSeconds(darknessSeconds);
 
         // Reveal the reset room from black.
+        
         if (fadeText) fadeText.text = "";
         yield return Fade(1f, 0f, fadeSeconds);
 
