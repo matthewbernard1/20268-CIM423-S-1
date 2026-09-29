@@ -1,12 +1,13 @@
 using UnityEngine;
 using Unity.XR.CoreUtils;
 
-/// <summary>
-/// Keeps the player's head inside the room and out of furniture. Put this on the XR Origin.
-/// Every frame: if the camera is outside the room box (minus the margin) the whole rig is shifted
-/// back inside, and if the camera overlaps a solid collider the rig is pushed out of it.
-/// Works for joystick movement, teleporting, the XR Interaction Simulator, and physically leaning.
-/// </summary>
+/// Keeps the player's head inside the room and out of furniture by using code and box coliders
+
+/// If the camera is outside the room box, the whole rig is shifted
+
+/// Works for joystick movement, teleporting, and the XR Interaction Simulator
+
+
 [RequireComponent(typeof(XROrigin))]
 public class RoomBounds : MonoBehaviour
 {
@@ -55,7 +56,6 @@ public class RoomBounds : MonoBehaviour
         if (origin.Camera == null) return;
         var cam = origin.Camera.transform;
 
-        // A big jump (teleport / wake up in bed) invalidates the last safe spot.
         if ((transform.position - lastOriginPos).sqrMagnitude > 1f)
             lastSafeHead = cam.position;
 
@@ -92,8 +92,8 @@ public class RoomBounds : MonoBehaviour
         for (int i = 0; i < n; i++)
         {
             var c = hits[i];
-            if (c.transform.IsChildOf(transform)) continue;   // the rig itself
-            if (IsStructural(c.bounds)) continue;              // walls / floor / ceiling / backdrop
+            if (c.transform.IsChildOf(transform)) continue;  
+            if (IsStructural(c.bounds)) continue;              
             overlapping = true;
 
             if (Physics.ComputePenetration(headCollider, head, Quaternion.identity,
@@ -106,14 +106,12 @@ public class RoomBounds : MonoBehaviour
         if (push.sqrMagnitude > 1e-8f)
             transform.position += push;
         else if (unresolved)
-            transform.position += lastSafeHead - head;   // stuck inside something we can't resolve: go back
+            transform.position += lastSafeHead - head;  
 
         if (!overlapping) lastSafeHead = head;
     }
 
-    // Anything that spans (nearly) the whole room in a horizontal direction is room
-    // structure — a wall, the floor, the ceiling, or a backdrop slab — not furniture.
-    // The room box already keeps the player inside those, so the push-out skips them.
+
     bool IsStructural(Bounds b)
     {
         return b.size.x > size.x * 0.95f || b.size.z > size.z * 0.95f;
