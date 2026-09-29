@@ -7,7 +7,6 @@ using Unity.XR.CoreUtils;
 
 /// Works for joystick movement, teleporting, and the XR Interaction Simulator
 
-
 [RequireComponent(typeof(XROrigin))]
 public class RoomBounds : MonoBehaviour
 {
