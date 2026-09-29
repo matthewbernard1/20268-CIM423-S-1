@@ -1,11 +1,10 @@
 using UnityEngine;
 using TMPro;
 
-/// <summary>
 /// Put on the book (inside the drawer). When grabbed/clicked it shows text.
 /// Works with XR Grab Interactable OR XR Simple Interactable - hook Interact() to Select Entered.
 /// Set taskId = "book" in the Inspector.
-/// </summary>
+
 public class BookInteraction : TaskObject
 {
     [Header("Book text (optional - the HUD sign text shows too)")]
