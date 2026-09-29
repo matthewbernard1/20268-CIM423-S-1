@@ -1,10 +1,8 @@
 using UnityEngine;
 
-/// <summary>
-/// Put on short_lamp_1. Changes the room's ambient (Environment) color from grey to white,
-/// optionally swaps the lamp shade material and turns on a light inside the lamp.
-/// Set taskId = "lamp" in the Inspector.
-/// </summary>
+
+/// Allows Lamp to turn on light in room
+
 public class LampInteraction : TaskObject
 {
     [Header("Lamp visuals (all optional)")]
@@ -17,7 +15,8 @@ public class LampInteraction : TaskObject
 
     protected override void OnInteract()
     {
-        // Room ambient grey -> white
+        // Room ambient color changes from grey to white
+        
         GameManager.Instance.SetAmbient(GameManager.Instance.ambientBright);
 
         if (lampRenderer && brightMaterial) lampRenderer.material = brightMaterial;
