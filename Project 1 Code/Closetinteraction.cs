@@ -1,13 +1,6 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
-/// Put on the closet door. Swings the door open and reveals the outfit inside.
-/// Set taskId = "closet" in the Inspector.
-///
-/// TIP: rotate around the hinge. If the door pivots from its center, make an empty parent
-/// GameObject at the hinge edge, put the door inside it, and drag that parent into "Door Pivot".
-/// </summary>
 public class ClosetInteraction : TaskObject
 {
     [Header("Door movement")]
@@ -45,7 +38,6 @@ public class ClosetInteraction : TaskObject
             StartCoroutine(Swing(closedRot * Quaternion.Euler(0f, openAngle, 0f)));
         if (outfitInside) outfitInside.SetActive(true);
 
-        // Fold -> hang: hide the folded pile, show the clothes on the hanger.
         if (foldedClothes != null)
             foreach (var g in foldedClothes) if (g) g.SetActive(false);
         if (hungClothes) hungClothes.SetActive(true);
@@ -69,10 +61,8 @@ public class ClosetInteraction : TaskObject
         base.ResetObject();
         StopAllCoroutines();
         if (hasStoredRot) Pivot.localRotation = closedRot;
-        // outfit can stay visible or hidden - hide it so the loop feels identical each time
         if (outfitInside) outfitInside.SetActive(false);
 
-        // Restore folded clothes, hide the hung version, for the dream loop.
         if (foldedClothes != null)
             foreach (var g in foldedClothes) if (g) g.SetActive(true);
         if (hungClothes) hungClothes.SetActive(false);
