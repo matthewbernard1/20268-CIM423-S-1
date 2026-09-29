@@ -1,13 +1,9 @@
 using System.Collections;
 using UnityEngine;
 
-/// <summary>
 /// Put on small_drawer. Slides the drawer out and reveals the book inside.
 /// Set taskId = "drawer" in the Inspector.
-///
-/// TIP: if the drawer is one mesh with the dresser, you need the drawer to be its OWN
-/// GameObject (child of the dresser) so it can move on its own.
-/// </summary>
+
 public class DrawerInteraction : TaskObject
 {
     [Header("Drawer movement")]
@@ -40,7 +36,9 @@ public class DrawerInteraction : TaskObject
         if (bookInside) bookInside.SetActive(true);
 
         // Once open, drop the drawer's own collider so its ray no longer blocks
-        // the book sitting inside it (the drawer is already "done").
+        
+        // the book sitting inside it
+        
         var col = GetComponent<Collider>();
         if (col) col.enabled = false;
     }
