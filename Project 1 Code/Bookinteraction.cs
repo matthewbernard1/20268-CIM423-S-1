@@ -40,3 +40,4 @@ public class BookInteraction : TaskObject
         foreach (var c in GetComponentsInChildren<Collider>(true)) c.enabled = visible;
     }
 }
+
